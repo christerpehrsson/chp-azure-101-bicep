@@ -1,3 +1,29 @@
+var nameSuffix = '${uniqueString(resourceGroup().id)}'
+
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2017-04-01' = {
+  name: 'serviceBus-${nameSuffix}'
+  location: 'northeurope'
+  sku: {
+    name:'Basic'
+  }
+  resource queue 'queues' = {
+    name: 'thumbnailqueue'
+  }
+  resource auth 'AuthorizationRules' = {
+    name: 'authser-${nameSuffix}'
+    properties: {
+      rights:[
+        'Manage'
+        'Listen'
+        'Send'
+      ]
+    }
+  }
+}
+
+output serviceBusConnectionString string = serviceBus::auth.listKeys().primaryConnectionString
+
+
 // TODO: add a resource of type Microsoft.ServiceBus/namespaces
 //       - use the 'Basic' service tier
 
